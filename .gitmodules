@@ -1,0 +1,3 @@
+[submodule "lib/UltraCurl"]
+	path = lib/UltraCurl
+	url = https://github.com/Psyhich/UltraCurl
