@@ -2,20 +2,25 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QScrollArea>
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
+#include "downloads_status.h"
 
-class MainWindow : public QMainWindow
+class CMainWindow : public QMainWindow
 {
+public:
+	CMainWindow(QWidget *parent = nullptr);
+	~CMainWindow();
+
+private:
+
+private:
+	QLineEdit *m_downloadInput;
+	QPushButton *m_downloadButton;
+	DownloadsData::EDownloadStatus *m_downloadsStatus;
+
 	Q_OBJECT
-
-  public:
-	MainWindow(QWidget *parent = nullptr);
-	~MainWindow();
-
-  private:
-	Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

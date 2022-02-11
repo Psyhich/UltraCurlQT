@@ -13,24 +13,18 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 set(CMAKE_AUTOUIC_SEARCH_PATHS assets/)
 
 set(PROJECT_SOURCES
-        src/main.cpp
+	src/main.cpp
 
-        include/mainwindow.h
-        src/mainwindow.cpp
-
-		assets/mainwindow.ui
+	include/mainwindow.h
+	src/mainwindow.cpp
 )
 
-set(UI assets/mainwindow.ui)
-
-qt5_wrap_ui(UI_HEADERS ${UI})
-
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(UltraCurlQT
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+	qt_add_executable(UltraCurlQT
+		MANUAL_FINALIZATION
+		${PROJECT_SOURCES}
 
-    )
+	)
 else()
 	add_executable(UltraCurlQT ${PROJECT_SOURCES} )
 endif()
@@ -44,15 +38,15 @@ set_property(TARGET UltraCurlQT PROPERTY AUTOUIC ON)
 
 
 set_target_properties(UltraCurlQT PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+	MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+	MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+	MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+	MACOSX_BUNDLE TRUE
+	WIN32_EXECUTABLE TRUE
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(UltraCurlQT)
+	qt_finalize_executable(UltraCurlQT)
 endif()
 
 target_link_libraries(UltraCurlQT 
