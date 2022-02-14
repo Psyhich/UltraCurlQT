@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QVBoxLayout>
 
 #include "download_data.h"
 #include "download_widget.h"
@@ -19,7 +20,7 @@ public:
 	~CStatusWidget();
 
 public slots:
-	void AddDownload(std::string sUriToDownload, const QFileInfo &pathToSave) noexcept;
+	void AddDownload(QString sUriToDownload, const QFileInfo &pathToSave) noexcept;
 
 private:
 

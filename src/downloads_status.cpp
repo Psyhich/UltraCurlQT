@@ -3,7 +3,6 @@
 #include <QErrorMessage>
 #include <QTextStream>
 #include <QScrollArea>
-#include <QHBoxLayout>
 
 #include "download_data.h"
 #include "downloads_status.h"
@@ -12,17 +11,24 @@
 
 CStatusWidget::CStatusWidget(QWidget *pParrent) : QWidget(pParrent)
 {
+	QVBoxLayout *pOuterLayout = new QVBoxLayout(this);
+
 	QScrollArea *pScrollArea = new QScrollArea(this);
-	pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	pScrollArea->setWidgetResizable(true);
+
+	QVBoxLayout *pInnerLayout = new QVBoxLayout(pScrollArea);
+	pInnerLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinAndMaxSize);
 
 	m_pDownloadsHolder = new QWidget(pScrollArea);
+	pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
 	pScrollArea->setWidget(m_pDownloadsHolder);
+	pScrollArea->setLayout(pInnerLayout);
 
-	QHBoxLayout *pInnerLayout = new QHBoxLayout(m_pDownloadsHolder);
-	pInnerLayout->setContentsMargins(0, 0, 0, 0);
-	pInnerLayout->setSpacing(0);
-	m_pDownloadsHolder->setLayout(pInnerLayout);
+	pOuterLayout->addWidget(pScrollArea);
 
+	setLayout(pOuterLayout);
 
 	m_pool = 
 		Downloaders::Concurrency::CConcurrentDownloader::AllocatePool(
@@ -44,8 +50,15 @@ CStatusWidget::CStatusWidget(QWidget *pParrent) : QWidget(pParrent)
 							progress != downloadProgress.end())
 						{
 							// Calculating progress of download in percents
-							entry->m_iDownloadProgress = 
-								std::get<0>(progress->second) / std::get<1>(progress->second) * 100;
+							if(std::get<1>(progress->second) <= 1e-14)
+							{
+								entry->m_iDownloadProgress = 0;
+							}
+							else
+							{
+								entry->m_iDownloadProgress = 
+									std::get<0>(progress->second) / std::get<1>(progress->second) * 100;
+							}
 						}
 					}
 				}
@@ -62,17 +75,21 @@ CStatusWidget::CStatusWidget(QWidget *pParrent) : QWidget(pParrent)
 			}
 			while(!m_bShouldStopUpdates.load());
 		});
+
 }
 
 CStatusWidget::~CStatusWidget()
 {
 	m_bShouldStopUpdates.store(true);
+	m_updaterThread.join();
 }
 
-void CStatusWidget::AddDownload(std::string sUriToDownload, const QFileInfo &pathToSave) noexcept
+void CStatusWidget::AddDownload(QString sUriToDownload, const QFileInfo &pathToSave) noexcept
 {
 	// Creating entry that will contain data about download
-	DownloadsData::DownloadEntry pEntry;
+	std::string sStdURIString = sUriToDownload.toStdString();
+	DownloadsData::DownloadEntry pEntry
+		{new DownloadsData::SDownloadEntry(CURI{sStdURIString})};
 	pEntry->m_savedFile = pathToSave;
 	pEntry->m_status = DownloadsData::EDownloadStatus::Downloading;
 
@@ -83,15 +100,16 @@ void CStatusWidget::AddDownload(std::string sUriToDownload, const QFileInfo &pat
 
 	// Creating widget that represent this download
 	CDownloadWidget *pStatus = new CDownloadWidget(pEntry, m_pDownloadsHolder);
-	m_pDownloadsHolder->layout()->addWidget(pStatus);
+	
+	layout()->addWidget(pStatus);
 
 	{
 		std::scoped_lock<std::mutex> widgetsLock{m_widgetsMutex};
 		m_pendingDownloads.push_back(pStatus);
 	}
 
-	m_pool->AddNewTask(std::move(CURI{sUriToDownload}),
-		[&](std::optional<HTTP::CHTTPResponse> &&response) -> bool
+	m_pool->AddNewTask(CURI{sStdURIString},
+		[&, pathToSave, pEntry](std::optional<HTTP::CHTTPResponse> &&response) -> bool
 		{
 			DownloadsData::EDownloadStatus statusToSet{
 				DownloadsData::EDownloadStatus::Failed};

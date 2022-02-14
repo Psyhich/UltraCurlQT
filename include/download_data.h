@@ -21,23 +21,30 @@ namespace DownloadsData {
 
 	struct SDownloadEntry
 	{
-		CURI m_uriDownloading;
+	public:
+		explicit SDownloadEntry(CURI uriToDownload) : 
+			m_uriDownloading{uriToDownload}
+		{
 
-		QFileInfo m_savedFile;
-
-		EDownloadStatus m_status;
-
-		int m_iDownloadProgress;
+		}
 
 		QString GetStatusString() const noexcept;
 		inline QString GetPath() const noexcept
 		{
-			return m_savedFile.absolutePath();
+			return m_savedFile.absoluteFilePath();
 		}
 		inline QString GetName() const noexcept
 		{
 			return m_savedFile.fileName();
 		}
+
+		CURI m_uriDownloading;
+
+		QFileInfo m_savedFile;
+
+		EDownloadStatus m_status{EDownloadStatus::None};
+
+		int m_iDownloadProgress{0};
 	};
 
 } // DownloadsData 

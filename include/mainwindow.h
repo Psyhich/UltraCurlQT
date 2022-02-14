@@ -14,12 +14,14 @@ public:
 	CMainWindow(QWidget *parent = nullptr);
 	~CMainWindow();
 
-private:
+private slots:
+	void CreateDownload() noexcept;
 
 private:
 	QLineEdit *m_downloadInput;
 	QPushButton *m_downloadButton;
-	DownloadsData::EDownloadStatus *m_downloadsStatus;
+
+	CStatusWidget *m_downloadsHolder;
 
 	Q_OBJECT
 };

@@ -15,8 +15,13 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS assets/)
 set(PROJECT_SOURCES
 	src/main.cpp
 
-	include/mainwindow.h
-	src/mainwindow.cpp
+	include/mainwindow.h src/mainwindow.cpp
+
+	include/downloads_status.h src/downloads_status.cpp
+
+	include/download_widget.h src/download_widget.cpp
+
+	include/download_data.h src/download_data.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

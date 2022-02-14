@@ -3,10 +3,6 @@
 QString DownloadsData::SDownloadEntry::GetStatusString() const noexcept
 {
 	switch(m_status) {
-		case EDownloadStatus::None:
-		{
-			return QString{"No status"};
-		}
 		case EDownloadStatus::Downloading:
 		{
 			return QString{"Currently downloading"};
@@ -19,5 +15,10 @@ QString DownloadsData::SDownloadEntry::GetStatusString() const noexcept
 		{
 			return QString{"Failed to download"};
 		}
+		default:
+		{
+			return QString{"No status"};
+		}
+
 	}
 }

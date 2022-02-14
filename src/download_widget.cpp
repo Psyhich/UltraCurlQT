@@ -1,4 +1,5 @@
 #include <QGridLayout>
+#include <QSizePolicy>
 
 #include "download_widget.h"
 
@@ -6,6 +7,9 @@ CDownloadWidget::CDownloadWidget(DownloadsData::DownloadEntry pEntryToUse, QWidg
 	QWidget(pParrent), m_pCurrentEntry{pEntryToUse}
 {
 	QGridLayout *pCurrentLayout = new QGridLayout(this);
+	pCurrentLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinimumSize);
+
+	setLayout(pCurrentLayout);
 
 	m_nameLabel = 
 		new QLabel(m_pCurrentEntry->GetName(), this);
@@ -16,7 +20,7 @@ CDownloadWidget::CDownloadWidget(DownloadsData::DownloadEntry pEntryToUse, QWidg
 		new QLabel(m_pCurrentEntry->GetPath(), this);
 	pCurrentLayout->addWidget(m_pathLabel, 0, 1, 1, 2);
 
-	m_currentProgress = new QProgressBar();
+	m_currentProgress = new QProgressBar(this);
 		m_currentProgress->setRange(0, 100);
 		m_currentProgress->setFormat("%p " + m_pCurrentEntry->GetStatusString());
 		m_currentProgress->setValue(0);
