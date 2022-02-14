@@ -12,23 +12,25 @@
 CStatusWidget::CStatusWidget(QWidget *pParrent) : QWidget(pParrent)
 {
 	QVBoxLayout *pOuterLayout = new QVBoxLayout(this);
+	setLayout(pOuterLayout);
 
 	QScrollArea *pScrollArea = new QScrollArea(this);
 	pScrollArea->setWidgetResizable(true);
 
-	QVBoxLayout *pInnerLayout = new QVBoxLayout(pScrollArea);
-	pInnerLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinAndMaxSize);
-
-	m_pDownloadsHolder = new QWidget(pScrollArea);
-	pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
-	pScrollArea->setWidget(m_pDownloadsHolder);
-	pScrollArea->setLayout(pInnerLayout);
-
 	pOuterLayout->addWidget(pScrollArea);
 
-	setLayout(pOuterLayout);
+	m_pDownloadsHolder = new QWidget();
+	QVBoxLayout *pInnerLayout = new QVBoxLayout();
+	m_pDownloadsHolder->setLayout(pInnerLayout);
+
+	pInnerLayout->setSizeConstraint(QLayout::SizeConstraint::SetMinAndMaxSize);
+
+	pScrollArea->setWidget(m_pDownloadsHolder);
+	// pScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	// pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+
+
 
 	m_pool = 
 		Downloaders::Concurrency::CConcurrentDownloader::AllocatePool(
@@ -100,8 +102,7 @@ void CStatusWidget::AddDownload(QString sUriToDownload, const QFileInfo &pathToS
 
 	// Creating widget that represent this download
 	CDownloadWidget *pStatus = new CDownloadWidget(pEntry, m_pDownloadsHolder);
-	
-	layout()->addWidget(pStatus);
+	m_pDownloadsHolder->layout()->addWidget(pStatus);
 
 	{
 		std::scoped_lock<std::mutex> widgetsLock{m_widgetsMutex};
