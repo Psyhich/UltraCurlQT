@@ -32,7 +32,7 @@
 *.app
 
 # build directory
-build
+build*
 
 # QtCreator CMake
 CMakeLists.txt.user*
